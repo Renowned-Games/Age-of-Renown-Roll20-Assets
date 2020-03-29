@@ -106,9 +106,6 @@
 <div class="scores">
 	<div class="body">Body: <span name="attr_Body"></span></div>
 	<div class="mind">Mind: <span name="attr_Mind"></span></div>
-	<div class="max-hp">Max HP: <span name="attr_MaxHP"></span></div>
-	<div class="max-ap">Max AP: <span name="attr_MaxAP"></span></div>
-	<div class="max-essence">Max Essence: <span name="attr_MaxEssence"></span></div>
 </div>
 <hr />
 <div class="abilities">
@@ -139,6 +136,12 @@
 	<div class="buy">
 		<div class="cost">Cost: <span name="attr_AbilityPointCost"></span> ability points</div>
 	</div>
+</div>
+<hr />
+<div class="stats">
+	<div class="hp">HP: <input type="number" name="attr_HP" step="1" value="1" /> / <span name="attr_HP_max"></span></div>
+	<div class="ap">AP: <input type="number" name="attr_AP" step="1" value="1" /> / <span name="attr_AP_max"></span></div>
+	<div class="essence">Essence: <input type="number" name="attr_Essence" step="1" value="1" /> / <span name="attr_Essence_max"></span></div>
 </div>
 
 
@@ -294,7 +297,7 @@
 
 
 	/**
-	 * Scores
+	 * Scores & stats
 	 */
 
 	// Get a composite attribute score
@@ -339,10 +342,10 @@
 				AttributeBuyCost: getTotalAttributeBuyCost(attrs),
 				Body: body,
 				Mind: mind,
-				MaxHP: getMaxHP(attrs.Strength, body, attrs.RenownRank),
-				MaxAP: getMaxAP(attrs.Agility),
-				MaxEssence: getMaxEssence(attrs.Spirit, attrs.RenownRank),
 				AbilityPointCost: getTotalAbilityPointCost(attrs),
+				HP_max: getMaxHP(attrs.Strength, body, attrs.RenownRank),
+				AP_max: getMaxAP(attrs.Agility),
+				Essence_max: getMaxEssence(attrs.Spirit, attrs.RenownRank),
 			};
 			attributeNames.forEach((attributeName) => {
 				Object.assign(fields, getAttributeCalculatedFields(attributeName, attrs[attributeName]));
@@ -379,29 +382,29 @@
 		});
 	});
 
+	// Update ability point cost on ability ranks change
+	on('change:martialranks change:magicranks change:physicaldefenseranks change:mentaldefenseranks', (e) => {
+		getParsedAttrs(abilityNames, (attrs) => {
+			setAttrs({AbilityPointCost: getTotalAbilityPointCost(attrs)});
+		});
+	});
+
 	// Update max HP on attribute / renown change
 	on('change:strength change:body change:renownrank', (e) => {
 		getParsedAttrs(['Strength', 'Body', 'RenownRank'], (attrs) => {
-			setAttrs({MaxHP: getMaxHP(attrs.Strength, attrs.Body, attrs.RenownRank)});
+			setAttrs({HP_max: getMaxHP(attrs.Strength, attrs.Body, attrs.RenownRank)});
 		});
 	});
 
 	// Update max AP on agility change
 	on('change:agility', (e) => {
-		setAttrs({MaxAP: getMaxAP(parseInt(e.newValue))});
+		setAttrs({AP_max: getMaxAP(parseInt(e.newValue))});
 	});
 
 	// Update max essence on attribute / renown change
 	on('change:spirit change:renownrank', (e) => {
 		getParsedAttrs(['Spirit', 'RenownRank'], (attrs) => {
-			setAttrs({MaxEssence: getMaxEssence(attrs.Spirit, attrs.RenownRank)});
-		});
-	});
-
-	// Update ability point cost on ability ranks change
-	on('change:martialranks change:magicranks change:physicaldefenseranks change:mentaldefenseranks', (e) => {
-		getParsedAttrs(abilityNames, (attrs) => {
-			setAttrs({AbilityPointCost: getTotalAbilityPointCost(attrs)});
+			setAttrs({Essence_max: getMaxEssence(attrs.Spirit, attrs.RenownRank)});
 		});
 	});
 
