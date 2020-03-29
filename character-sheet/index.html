@@ -182,6 +182,7 @@
 	function getParsedAttrs(attributes, callback) {
 		getAttrs(attributes, (attrs) => {
 			for (let p in attrs) {
+				if (!attrs[p].match) continue;
 				if (attrs[p].match(/^\-?\d+$/)) attrs[p] = parseInt(attrs[p]);
 			}
 			callback(attrs);
