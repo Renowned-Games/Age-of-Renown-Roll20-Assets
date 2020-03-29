@@ -178,6 +178,16 @@
 		return v1 + (v2 - v1) * t;
 	}
 
+	// Get parsed attributes and run callback
+	function getParsedAttrs(attributes, callback) {
+		getAttrs(attributes, (attrs) => {
+			for (let p in attrs) {
+				if (attrs[p].match(/^\-?\d+$/)) attrs[p] = parseInt(attrs[p]);
+			}
+			callback(attrs);
+		});
+	}
+
 
 	/**
 	 * Creation & progression
@@ -206,7 +216,7 @@
 	function getTotalAttributeBuyCost(attrs) {
 		let cost = 0;
 		attributeNames.forEach((attributeName) => {
-			cost += getAttributeBuyCost(parseInt(attrs[attributeName]));
+			cost += getAttributeBuyCost(attrs[attributeName]);
 		});
 		return cost;
 	}
@@ -220,7 +230,7 @@
 	function getTotalAbilityPointCost(attrs) {
 		let cost = 0;
 		abilityNames.forEach((abilityName) => {
-			cost += getAbilityPointCost(parseInt(attrs[abilityName]));
+			cost += getAbilityPointCost(attrs[abilityName]);
 		});
 		return cost;
 	}
@@ -314,27 +324,27 @@
 
 	// Update all calculated fields on sheet open
 	on('sheet:opened', (e) => {
-		getAttrs([
+		getParsedAttrs([
 			'Level', 'RenownRank',
 			'Strength', 'Agility', 'Acuity', 'Cognition', 'Willpower', 'Spirit',
 			'MartialRanks', 'MagicRanks', 'PhysicalDefenseRanks', 'MentalDefenseRanks',
 		], (attrs) => {
-			let body = getCompositeAttributeScore([parseInt(attrs.Strength), parseInt(attrs.Agility), parseInt(attrs.Acuity)]);
-			let mind = getCompositeAttributeScore([parseInt(attrs.Cognition), parseInt(attrs.Willpower), parseInt(attrs.Spirit)]);
+			let body = getCompositeAttributeScore([attrs.Strength, attrs.Agility, attrs.Acuity]);
+			let mind = getCompositeAttributeScore([attrs.Cognition, attrs.Willpower, attrs.Spirit]);
 			let fields = {
-				TotalAbilityPoints: getTotalAbilityPoints(parseInt(attrs.RenownRank)),
-				TotalPhysicalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Acuity)),
-				TotalMentalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Cognition)),
+				TotalAbilityPoints: getTotalAbilityPoints(attrs.RenownRank),
+				TotalPhysicalSkillPoints: getTotalSkillPoints(attrs.Level, attrs.Acuity),
+				TotalMentalSkillPoints: getTotalSkillPoints(attrs.Level, attrs.Cognition),
 				AttributeBuyCost: getTotalAttributeBuyCost(attrs),
 				Body: body,
 				Mind: mind,
-				MaxHP: getMaxHP(parseInt(attrs.Strength), body, parseInt(attrs.RenownRank)),
-				MaxAP: getMaxAP(parseInt(attrs.Agility)),
-				MaxEssence: getMaxEssence(parseInt(attrs.Spirit), parseInt(attrs.RenownRank)),
+				MaxHP: getMaxHP(attrs.Strength, body, attrs.RenownRank),
+				MaxAP: getMaxAP(attrs.Agility),
+				MaxEssence: getMaxEssence(attrs.Spirit, attrs.RenownRank),
 				AbilityPointCost: getTotalAbilityPointCost(attrs),
 			};
 			attributeNames.forEach((attributeName) => {
-				Object.assign(fields, getAttributeCalculatedFields(attributeName, parseInt(attrs[attributeName])));
+				Object.assign(fields, getAttributeCalculatedFields(attributeName, attrs[attributeName]));
 			});
 			setAttrs(fields);
 		});
@@ -347,21 +357,21 @@
 
 	// Update total skill points on level / skill attribute change
 	on('change:level change:acuity change:cognition', (e) => {
-		getAttrs(['Level', 'Acuity', 'Cognition'], (attrs) => {
+		getParsedAttrs(['Level', 'Acuity', 'Cognition'], (attrs) => {
 			setAttrs({
-				TotalPhysicalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Acuity)),
-				TotalMentalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Cognition)),
+				TotalPhysicalSkillPoints: getTotalSkillPoints(attrs.Level, attrs.Acuity),
+				TotalMentalSkillPoints: getTotalSkillPoints(attrs.Level, attrs.Cognition),
 			});
 		});
 	});
 
 	// Update calculated attribute fields on attribute change
 	on('change:strength change:agility change:acuity change:cognition change:willpower change:spirit', (e) => {
-		getAttrs(attributeNames, (attrs) => {
+		getParsedAttrs(attributeNames, (attrs) => {
 			let fields = {
 				AttributeBuyCost: getTotalAttributeBuyCost(attrs),
-				Body: getCompositeAttributeScore([parseInt(attrs.Strength), parseInt(attrs.Agility), parseInt(attrs.Acuity)]),
-				Mind: getCompositeAttributeScore([parseInt(attrs.Cognition), parseInt(attrs.Willpower), parseInt(attrs.Spirit)]),
+				Body: getCompositeAttributeScore([attrs.Strength, attrs.Agility, attrs.Acuity]),
+				Mind: getCompositeAttributeScore([attrs.Cognition, attrs.Willpower, attrs.Spirit]),
 			};
 			Object.assign(fields, getAttributeCalculatedFields(getAttributeName(e.sourceAttribute), parseInt(e.newValue)));
 			setAttrs(fields);
@@ -370,8 +380,8 @@
 
 	// Update max HP on attribute / renown change
 	on('change:strength change:body change:renownrank', (e) => {
-		getAttrs(['Strength', 'Body', 'RenownRank'], (attrs) => {
-			setAttrs({MaxHP: getMaxHP(parseInt(attrs.Strength), parseInt(attrs.Body), parseInt(attrs.RenownRank))});
+		getParsedAttrs(['Strength', 'Body', 'RenownRank'], (attrs) => {
+			setAttrs({MaxHP: getMaxHP(attrs.Strength, attrs.Body, attrs.RenownRank)});
 		});
 	});
 
@@ -382,14 +392,14 @@
 
 	// Update max essence on attribute / renown change
 	on('change:spirit change:renownrank', (e) => {
-		getAttrs(['Spirit', 'RenownRank'], (attrs) => {
-			setAttrs({MaxEssence: getMaxEssence(parseInt(attrs.Spirit), parseInt(attrs.RenownRank))});
+		getParsedAttrs(['Spirit', 'RenownRank'], (attrs) => {
+			setAttrs({MaxEssence: getMaxEssence(attrs.Spirit, attrs.RenownRank)});
 		});
 	});
 
 	// Update ability point cost on ability ranks change
 	on('change:martialranks change:magicranks change:physicaldefenseranks change:mentaldefenseranks', (e) => {
-		getAttrs(abilityNames, (attrs) => {
+		getParsedAttrs(abilityNames, (attrs) => {
 			setAttrs({AbilityPointCost: getTotalAbilityPointCost(attrs)});
 		});
 	});
