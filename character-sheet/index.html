@@ -29,6 +29,26 @@
 	</div>
 </div>
 <hr />
+<div class="progression">
+	<div class="level">
+		<label>
+			<span>Level</span>
+			<input type="number" min="1" max="10" step="1" name="attr_Level" />
+		</label>
+	</div>
+	<div class="renown">
+		<label>
+			<span>Renown Rank</span>
+			<input type="number" min="0" max="5" step="1" name="attr_RenownRank" />
+		</label>
+	</div>
+	<div class="points">
+		<div><span name="attr_TotalAbilityPoints"></span> ability points</div>
+		<div><span name="attr_TotalPhysicalSkillPoints"></span> physical skill points</div>
+		<div><span name="attr_TotalMentalSkillPoints"></span> mental skill points</div>
+	</div>
+</div>
+<hr />
 <div class="attributes">
 	<div class="attribute">
 		<label class="score">
@@ -79,7 +99,7 @@
 		<div class="info die">d<span name="attr_SpiritDie"></span></div>
 	</div>
 	<div class="buy">
-		<div class="cost"><span name="attr_AttributeBuyCost"></span> attribute buy points</div>
+		<div class="cost">Cost: <span name="attr_AttributeBuyCost"></span> attribute buy points</div>
 	</div>
 </div>
 <hr />
@@ -109,7 +129,7 @@
 		</label>
 	</div>
 	<div class="buy">
-		<div class="cost"><span name="attr_AbilityPointCost"></span> ability points</div>
+		<div class="cost">Cost: <span name="attr_AbilityPointCost"></span> ability points</div>
 	</div>
 </div>
 
@@ -117,9 +137,13 @@
 <script type="text/worker">
 
 
-	// Config
+	// Sheet attribute settings
 	const attributeNames = ['Strength', 'Agility', 'Acuity', 'Cognition', 'Willpower', 'Spirit'];
 	const abilityNames = ['MartialRanks', 'MagicRanks', 'PhysicalDefenseRanks', 'MentalDefenseRanks'];
+
+	// Progression settings
+	const MIN_LEVEL = 1;
+	const MAX_LEVEL = 10;
 
 
 	/**
@@ -136,10 +160,29 @@
 		return result;
 	}
 
+	// Perform linear interpolation between two values
+	function interpolateLinear(v1, v2, t) {
+		return v1 + (v2 - v1) * t;
+	}
+
 
 	/**
 	 * Creation & progression
 	 */
+
+	// Get total ability points by renown rank
+	func getTotalAbilityPoints(renownRank) {
+		return increasingProgression(renownRank + 1) - 1;
+	}
+
+	// Get total skill points by level & attribute score
+	func getTotalSkillPoints(level, attributeScore) {
+		return Math.round(interpolateLinear(
+			attributeScore,
+			attributeScore * 3,
+			(level - MIN_LEVEL) / (MAX_LEVEL - MIN_LEVEL)
+		));
+	}
 
 	// Get the buy cost for an attribute score
 	function getAttributeBuyCost(attributeScore) {
@@ -233,19 +276,24 @@
 	// Update on sheet open
 	on('sheet:opened', (e) => {
 		getAttrs([
+			'Level', 'RenownRank',
 			'Strength', 'Agility', 'Acuity', 'Cognition', 'Willpower', 'Spirit',
 			'MartialRanks', 'MagicRanks', 'PhysicalDefenseRanks', 'MentalDefenseRanks',
 		], (attrs) => {
-			let fields = {};
+
+			// Get point totals & costs
+			let fields = {
+				TotalAbilityPoints: getTotalAbilityPoints(parseInt(attrs.RenownRank)),
+				TotalPhysicalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Acuity)),
+				TotalMentalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Cognition)),
+				AttributeBuyCost: getTotalAttributeBuyCost(attrs),
+				AbilityPointCost: getTotalAbilityPointCost(attrs),
+			};
 
 			// Get attribute calculated fields
 			attributeNames.forEach((attributeName) => {
 				Object.assign(fields, getAttributeCalculatedFields(attributeName, parseInt(attrs[attributeName])));
 			});
-
-			// Get point costs
-			fields['AttributeBuyCost'] = getTotalAttributeBuyCost(attrs);
-			fields['AbilityPointCost'] = getTotalAbilityPointCost(attrs);
 
 			setAttrs(fields);
 		});
