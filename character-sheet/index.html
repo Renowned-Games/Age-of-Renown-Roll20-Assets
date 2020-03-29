@@ -171,12 +171,12 @@
 	 */
 
 	// Get total ability points by renown rank
-	func getTotalAbilityPoints(renownRank) {
+	function getTotalAbilityPoints(renownRank) {
 		return increasingProgression(renownRank + 1) - 1;
 	}
 
 	// Get total skill points by level & attribute score
-	func getTotalSkillPoints(level, attributeScore) {
+	function getTotalSkillPoints(level, attributeScore) {
 		return Math.round(interpolateLinear(
 			attributeScore,
 			attributeScore * 3,
