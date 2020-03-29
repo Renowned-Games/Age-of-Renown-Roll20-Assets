@@ -105,7 +105,10 @@
 <hr />
 <div class="scores">
 	<div class="body">Body: <span name="attr_Body"></span></div>
-	<div class="body">Mind: <span name="attr_Mind"></span></div>
+	<div class="mind">Mind: <span name="attr_Mind"></span></div>
+	<div class="max-hp">Max HP: <span name="attr_MaxHP"></span></div>
+	<div class="max-ap">Max AP: <span name="attr_MaxAP"></span></div>
+	<div class="max-essence">Max Essence: <span name="attr_MaxEssence"></span></div>
 </div>
 <hr />
 <div class="abilities">
@@ -149,6 +152,11 @@
 	// Progression settings
 	const MIN_LEVEL = 1;
 	const MAX_LEVEL = 10;
+
+	// Stat settings
+	const MAX_HP_PER_BODY = 2;
+	const MAX_HP_PER_RENOWN = 2;
+	const MAX_AP_BASE = 5;
 
 
 	/**
@@ -284,6 +292,21 @@
 		return Math.floor((attributes[0] + attributes[1]) / 2);
 	}
 
+	// Get max HP
+	function getMaxHP(strength, body, renown) {
+		return strength + MAX_HP_PER_BODY * body + MAX_HP_PER_RENOWN * renown;
+	}
+
+	// Get max AP
+	function getMaxAP(agility) {
+		return MAX_AP_BASE + agility;
+	}
+
+	// Get max essence
+	function getMaxEssence(spirit, renown) {
+		return spirit + renown;
+	}
+
 
 	/**
 	 * Sheet
@@ -301,15 +324,23 @@
 				TotalPhysicalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Acuity)),
 				TotalMentalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Cognition)),
 				AttributeBuyCost: getTotalAttributeBuyCost(attrs),
-				AbilityPointCost: getTotalAbilityPointCost(attrs),
 				Body: getCompositeAttributeScore([parseInt(attrs.Strength), parseInt(attrs.Agility), parseInt(attrs.Acuity)]),
 				Mind: getCompositeAttributeScore([parseInt(attrs.Cognition), parseInt(attrs.Willpower), parseInt(attrs.Spirit)]),
+				MaxHP: getMaxHP(parseInt(attrs.Strength), parseInt(attrs.Body), parseInt(attrs.RenownRank)),
+				MaxAP: getMaxAP(parseInt(attrs.Agility)),
+				MaxEssence: getMaxEssence(parseInt(attrs.Spirit), parseInt(attrs.RenownRank)),
+				AbilityPointCost: getTotalAbilityPointCost(attrs),
 			};
 			attributeNames.forEach((attributeName) => {
 				Object.assign(fields, getAttributeCalculatedFields(attributeName, parseInt(attrs[attributeName])));
 			});
 			setAttrs(fields);
 		});
+	});
+
+	// Update total ability points on renown change
+	on('change:renownrank', (e) => {
+		setAttrs({TotalAbilityPoints: getTotalAbilityPoints(parseInt(e.newValue))});
 	});
 
 	// Update total skill points on level / skill attribute change
@@ -322,11 +353,6 @@
 		});
 	});
 
-	// Update total ability points on renown change
-	on('change:renownrank', (e) => {
-		setAttrs({TotalAbilityPoints: getTotalAbilityPoints(parseInt(e.newValue))});
-	});
-
 	// Update calculated attribute fields on attribute change
 	on('change:strength change:agility change:acuity change:cognition change:willpower change:spirit', (e) => {
 		getAttrs(attributeNames, (attrs) => {
@@ -337,6 +363,25 @@
 			};
 			Object.assign(fields, getAttributeCalculatedFields(getAttributeName(e.sourceAttribute), parseInt(e.newValue)));
 			setAttrs(fields);
+		});
+	});
+
+	// Update max HP on attribute / renown change
+	on('change:strength change:body change:renownrank', (e) => {
+		getAttrs(['Strength', 'Body', 'RenownRank'], (attrs) => {
+			setAttrs({MaxHP: getMaxHP(parseInt(attrs.Strength), parseInt(attrs.Body), parseInt(attrs.RenownRank))});
+		});
+	});
+
+	// Update max AP on agility change
+	on('change:agility', (e) => {
+		setAttrs({MaxAP: getMaxAP(parseInt(e.newValue))});
+	});
+
+	// Update max essence on attribute / renown change
+	on('change:spirit change:renownrank', (e) => {
+		getAttrs(['Spirit', 'RenownRank'], (attrs) => {
+			setAttrs({MaxEssence: getMaxEssence(parseInt(attrs.Spirit), parseInt(attrs.RenownRank))});
 		});
 	});
 
