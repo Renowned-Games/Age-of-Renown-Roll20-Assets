@@ -1,0 +1,122 @@
+<div class="attributes">
+	<div class="attribute">
+		<label class="score">
+			<span>Strength</span>
+			<input type="number" name="attr_Strength" min="3" max="10" step="1" value="4" />
+		</label>
+		<div class="info target"><span name="attr_StrengthTarget"></span>+</div>
+		<div class="info die">d<span name="attr_StrengthDie"></span></div>
+	</div>
+	<div class="attribute">
+		<label class="score">
+			<span>Agility</span>
+			<input type="number" name="attr_Agility" min="3" max="10" step="1" value="4" />
+		</label>
+		<div class="info target"><span name="attr_AgilityTarget"></span>+</div>
+		<div class="info die">d<span name="attr_AgilityDie"></span></div>
+	</div>
+	<div class="attribute">
+		<label class="score">
+			<span>Acuity</span>
+			<input type="number" name="attr_Acuity" min="3" max="10" step="1" value="4" />
+		</label>
+		<div class="info target"><span name="attr_AcuityTarget"></span>+</div>
+		<div class="info die">d<span name="attr_AcuityDie"></span></div>
+	</div>
+	<div class="attribute">
+		<label class="score">
+			<span>Cognition</span>
+			<input type="number" name="attr_Cognition" min="3" max="10" step="1" value="4" />
+		</label>
+		<div class="info target"><span name="attr_CognitionTarget"></span>+</div>
+		<div class="info die">d<span name="attr_CognitionDie"></span></div>
+	</div>
+	<div class="attribute">
+		<label class="score">
+			<span>Willpower</span>
+			<input type="number" name="attr_Willpower" min="3" max="10" step="1" value="4" />
+		</label>
+		<div class="info target"><span name="attr_WillpowerTarget"></span>+</div>
+		<div class="info die">d<span name="attr_WillpowerDie"></span></div>
+	</div>
+	<div class="attribute">
+		<label class="score">
+			<span>Spirit</span>
+			<input type="number" name="attr_Spirit" min="3" max="10" step="1" value="4" />
+		</label>
+		<div class="info target"><span name="attr_SpiritTarget"></span>+</div>
+		<div class="info die">d<span name="attr_SpiritDie"></span></div>
+	</div>
+</div>
+
+
+<script type="text/worker">
+
+
+	/**
+	 * Attributes
+	 */
+
+	// Get an attribute name from lowercase version
+	function getAttributeName(name) {
+		return name.charAt(0).toUpperCase() + name.substr(1).toLowerCase();
+	}
+
+	// Get the confirmation target for an attribute score
+	function getAttributeConfirmationTarget(attributeScore) {
+		switch (attributeScore) {
+			case 1: return 9;
+			case 2: return 8;
+			case 3: return 8;
+			case 4: return 7;
+			case 5: return 6;
+			case 6: return 5;
+			case 7: return 4;
+			case 8: return 4;
+			case 9: return 3;
+			case 10: return 3;
+			case 11: return 2;
+			case 12: return 2;
+			case 13: return 2;
+		}
+	}
+
+	// Get the die size for an attribute score
+	function getAttributeDieSize(attributeScore) {
+		switch (attributeScore) {
+			case 1: return 2;
+			case 2: return 2;
+			case 3: return 2;
+			case 4: return 3;
+			case 5: return 4;
+			case 6: return 6;
+			case 7: return 8;
+			case 8: return 8;
+			case 9: return 10;
+			case 10: return 10;
+			case 11: return 12;
+			case 12: return 12;
+			case 13: return 12;
+		}
+	}
+
+	// Update attribute calculated fields
+	function updateAttributeFields(attribute, value) {
+		attrs = {};
+		attrs[attribute + 'Target'] = getAttributeConfirmationTarget(value);
+		attrs[attribute + 'Die'] = getAttributeDieSize(value);
+		setAttrs(attrs);
+	}
+
+
+	/**
+	 * Sheet
+	 */
+
+	// Update attribute calculated fields on attribute change
+	on('change:strength change:agility change:acuity change:cognition change:willpower change:spirit', (e) => {
+		updateAttributeFields(getAttributeName(e.sourceAttribute), parseInt(e.newValue));
+	});
+
+
+</script>
