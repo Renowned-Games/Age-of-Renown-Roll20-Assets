@@ -47,10 +47,51 @@
 		<div class="info target"><span name="attr_SpiritTarget"></span>+</div>
 		<div class="info die">d<span name="attr_SpiritDie"></span></div>
 	</div>
+	<div class="buy">
+		<div class="cost"><span name="attr_AttributeBuyCost"></span> points</div>
+	</div>
 </div>
 
 
 <script type="text/worker">
+
+
+	// Config
+	const attributeNames = ['Strength', 'Agility', 'Acuity', 'Cognition', 'Willpower', 'Spirit'];
+
+
+	/**
+	 * Utility methods
+	 */
+
+	// Apply an increasing value over a progression
+	function increasingProgression(to, increaseBy = 1, increaseEvery = 1) {
+		let result = 0, value = 0;
+		for (let i = 0; i <= to; ++i) {
+			if (i && (i - 1) % increaseEvery == 0) value += increaseBy;
+			result += value;
+		}
+		return result;
+	}
+
+
+	/**
+	 * Creation & progression
+	 */
+
+	// Get the buy cost for an attribute score
+	function getAttributeBuyCost(attributeScore) {
+		return increasingProgression(attributeScore - 3, 1, 2) - 1;
+	}
+
+	// Get the total attribute buy cost
+	function getTotalAttributeBuyCost(attrs) {
+		let cost = 0;
+		attributeNames.forEach((attributeName) => {
+			cost += getAttributeBuyCost(parseInt(attrs[attributeName]));
+		});
+		return cost;
+	}
 
 
 	/**
@@ -100,12 +141,12 @@
 		}
 	}
 
-	// Update attribute calculated fields
-	function updateAttributeFields(attribute, value) {
-		attrs = {};
-		attrs[attribute + 'Target'] = getAttributeConfirmationTarget(value);
-		attrs[attribute + 'Die'] = getAttributeDieSize(value);
-		setAttrs(attrs);
+	// Get calculated fields for an attribute
+	function getAttributeCalculatedFields(attribute, value) {
+		fields = {};
+		fields[attribute + 'Target'] = getAttributeConfirmationTarget(value);
+		fields[attribute + 'Die'] = getAttributeDieSize(value);
+		return fields;
 	}
 
 
@@ -113,9 +154,30 @@
 	 * Sheet
 	 */
 
-	// Update attribute calculated fields on attribute change
+	// Update on sheet open
+	on('sheet:opened', (e) => {
+		getAttrs(['Strength', 'Agility', 'Acuity', 'Cognition', 'Willpower', 'Spirit'], (attrs) => {
+			let fields = {};
+
+			// Get attribute calculated fields
+			attributeNames.forEach((attributeName) => {
+				Object.assign(fields, getAttributeCalculatedFields(attributeName, parseInt(attrs[attributeName])));
+			});
+
+			// Get attribute buy cost
+			fields['AttributeBuyCost'] = getTotalAttributeBuyCost(attrs);
+
+			setAttrs(fields);
+		});
+	});
+
+	// Update on attribute change
 	on('change:strength change:agility change:acuity change:cognition change:willpower change:spirit', (e) => {
-		updateAttributeFields(getAttributeName(e.sourceAttribute), parseInt(e.newValue));
+		getAttrs(attributeNames, (attrs) => {
+			let fields = getAttributeCalculatedFields(getAttributeName(e.sourceAttribute), parseInt(e.newValue));
+			fields['AttributeBuyCost'] = getTotalAttributeBuyCost(attrs);
+			setAttrs(fields);
+		});
 	});
 
 
