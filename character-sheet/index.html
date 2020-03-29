@@ -317,17 +317,18 @@
 		getAttrs([
 			'Level', 'RenownRank',
 			'Strength', 'Agility', 'Acuity', 'Cognition', 'Willpower', 'Spirit',
-			'Body',
 			'MartialRanks', 'MagicRanks', 'PhysicalDefenseRanks', 'MentalDefenseRanks',
 		], (attrs) => {
+			let body = getCompositeAttributeScore([parseInt(attrs.Strength), parseInt(attrs.Agility), parseInt(attrs.Acuity)]);
+			let mind = getCompositeAttributeScore([parseInt(attrs.Cognition), parseInt(attrs.Willpower), parseInt(attrs.Spirit)]);
 			let fields = {
 				TotalAbilityPoints: getTotalAbilityPoints(parseInt(attrs.RenownRank)),
 				TotalPhysicalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Acuity)),
 				TotalMentalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Cognition)),
 				AttributeBuyCost: getTotalAttributeBuyCost(attrs),
-				Body: getCompositeAttributeScore([parseInt(attrs.Strength), parseInt(attrs.Agility), parseInt(attrs.Acuity)]),
-				Mind: getCompositeAttributeScore([parseInt(attrs.Cognition), parseInt(attrs.Willpower), parseInt(attrs.Spirit)]),
-				MaxHP: getMaxHP(parseInt(attrs.Strength), parseInt(attrs.Body), parseInt(attrs.RenownRank)),
+				Body: body,
+				Mind: mind,
+				MaxHP: getMaxHP(parseInt(attrs.Strength), body, parseInt(attrs.RenownRank)),
 				MaxAP: getMaxAP(parseInt(attrs.Agility)),
 				MaxEssence: getMaxEssence(parseInt(attrs.Spirit), parseInt(attrs.RenownRank)),
 				AbilityPointCost: getTotalAbilityPointCost(attrs),
