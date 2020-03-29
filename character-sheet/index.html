@@ -273,15 +273,13 @@
 	 * Sheet
 	 */
 
-	// Update on sheet open
+	// Update all calculated fields on sheet open
 	on('sheet:opened', (e) => {
 		getAttrs([
 			'Level', 'RenownRank',
 			'Strength', 'Agility', 'Acuity', 'Cognition', 'Willpower', 'Spirit',
 			'MartialRanks', 'MagicRanks', 'PhysicalDefenseRanks', 'MentalDefenseRanks',
 		], (attrs) => {
-
-			// Get point totals & costs
 			let fields = {
 				TotalAbilityPoints: getTotalAbilityPoints(parseInt(attrs.RenownRank)),
 				TotalPhysicalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Acuity)),
@@ -289,26 +287,38 @@
 				AttributeBuyCost: getTotalAttributeBuyCost(attrs),
 				AbilityPointCost: getTotalAbilityPointCost(attrs),
 			};
-
-			// Get attribute calculated fields
 			attributeNames.forEach((attributeName) => {
 				Object.assign(fields, getAttributeCalculatedFields(attributeName, parseInt(attrs[attributeName])));
 			});
-
 			setAttrs(fields);
 		});
 	});
 
-	// Update on attribute change
+	// Update total skill points on level / skill attribute change
+	on('change:level change:acuity change:cognition', (e) => {
+		getAttrs(['Level', 'Acuity', 'Cognition'], (attrs) => {
+			setAttrs({
+				TotalPhysicalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Acuity)),
+				TotalMentalSkillPoints: getTotalSkillPoints(parseInt(attrs.Level), parseInt(attrs.Cognition)),
+			});
+		});
+	});
+
+	// Update total ability points on renown change
+	on('change:renownrank', (e) => {
+		setAttrs({TotalAbilityPoints: getTotalAbilityPoints(parseInt(e.newValue))});
+	});
+
+	// Update calculated attribute fields & attribute buy cost on attribute change
 	on('change:strength change:agility change:acuity change:cognition change:willpower change:spirit', (e) => {
 		getAttrs(attributeNames, (attrs) => {
-			let fields = getAttributeCalculatedFields(getAttributeName(e.sourceAttribute), parseInt(e.newValue));
-			fields['AttributeBuyCost'] = getTotalAttributeBuyCost(attrs);
+			let fields = {AttributeBuyCost: getTotalAttributeBuyCost(attrs)};
+			Object.assign(fields, getAttributeCalculatedFields(getAttributeName(e.sourceAttribute), parseInt(e.newValue)));
 			setAttrs(fields);
 		});
 	});
 
-	// Update on ability ranks change
+	// Update ability point cost on ability ranks change
 	on('change:martialranks change:magicranks change:physicaldefenseranks change:mentaldefenseranks', (e) => {
 		getAttrs(abilityNames, (attrs) => {
 			setAttrs({AbilityPointCost: getTotalAbilityPointCost(attrs)});
