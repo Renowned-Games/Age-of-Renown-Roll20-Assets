@@ -114,24 +114,140 @@
 			<span>Martial</span>
 			<input type="number" name="attr_MartialRanks" min="0" max="3" step="1" value="0" />
 		</label>
+		<div class="rolls">
+			<button type="roll" name="roll_MartialStrength" value="
+				?{Favor
+					|None,/r (@{MartialRanks}+2)d10>@{StrengthTarget}
+					|1 Favor,/r (@{MartialRanks}+3)d10dl1>@{StrengthTarget}
+					|2 Favor,/r (@{MartialRanks}+4)d10dl2>@{StrengthTarget}
+					|1 Disfavor,/r (@{MartialRanks}+3)d10dh1>@{StrengthTarget}
+					|2 Disfavor,/r (@{MartialRanks}+4)d10dh2>@{StrengthTarget}
+				}
+			">Str</button>
+			<button type="roll" name="roll_MartialAgility" value="
+				?{Favor
+					|None,/r (@{MartialRanks}+2)d10>@{AgilityTarget}
+					|1 Favor,/r (@{MartialRanks}+3)d10dl1>@{AgilityTarget}
+					|2 Favor,/r (@{MartialRanks}+4)d10dl2>@{AgilityTarget}
+					|1 Disfavor,/r (@{MartialRanks}+3)d10dh1>@{AgilityTarget}
+					|2 Disfavor,/r (@{MartialRanks}+4)d10dh2>@{AgilityTarget}
+				}
+			">Agi</button>
+			<button type="roll" name="roll_MartialAcuity" value="
+				?{Favor
+					|None,/r (@{MartialRanks}+2)d10>@{AcuityTarget}
+					|1 Favor,/r (@{MartialRanks}+3)d10dl1>@{AcuityTarget}
+					|2 Favor,/r (@{MartialRanks}+4)d10dl2>@{AcuityTarget}
+					|1 Disfavor,/r (@{MartialRanks}+3)d10dh1>@{AcuityTarget}
+					|2 Disfavor,/r (@{MartialRanks}+4)d10dh2>@{AcuityTarget}
+				}
+			">Acu</button>
+		</div>
 	</div>
 	<div class="ability">
 		<label class="score">
 			<span>Magic</span>
 			<input type="number" name="attr_MagicRanks" min="0" max="3" step="1" value="0" />
 		</label>
+		<div class="rolls">
+			<button type="roll" name="roll_MagicCognition" value="
+				?{Favor
+					|None,/r (@{MagicRanks}+2)d10>@{CognitionTarget}
+					|1 Favor,/r (@{MagicRanks}+3)d10dl1>@{CognitionTarget}
+					|2 Favor,/r (@{MagicRanks}+4)d10dl2>@{CognitionTarget}
+					|1 Disfavor,/r (@{MagicRanks}+3)d10dh1>@{CognitionTarget}
+					|2 Disfavor,/r (@{MagicRanks}+4)d10dh2>@{CognitionTarget}
+				}
+			">Cog</button>
+			<button type="roll" name="roll_MagicWillpower" value="
+				?{Favor
+					|None,/r (@{MagicRanks}+2)d10>@{WillpowerTarget}
+					|1 Favor,/r (@{MagicRanks}+3)d10dl1>@{WillpowerTarget}
+					|2 Favor,/r (@{MagicRanks}+4)d10dl2>@{WillpowerTarget}
+					|1 Disfavor,/r (@{MagicRanks}+3)d10dh1>@{WillpowerTarget}
+					|2 Disfavor,/r (@{MagicRanks}+4)d10dh2>@{WillpowerTarget}
+				}
+			">Wpw</button>
+			<button type="roll" name="roll_MagicSpirit" value="
+				?{Favor
+					|None,/r (@{MagicRanks}+2)d10>@{SpiritTarget}
+					|1 Favor,/r (@{MagicRanks}+3)d10dl1>@{SpiritTarget}
+					|2 Favor,/r (@{MagicRanks}+4)d10dl2>@{SpiritTarget}
+					|1 Disfavor,/r (@{MagicRanks}+3)d10dh1>@{SpiritTarget}
+					|2 Disfavor,/r (@{MagicRanks}+4)d10dh2>@{SpiritTarget}
+				}
+			">Spr</button>
+		</div>
 	</div>
 	<div class="ability">
 		<label class="score">
 			<span>Physical Defense</span>
 			<input type="number" name="attr_PhysicalDefenseRanks" min="0" max="3" step="1" value="0" />
 		</label>
+		<div class="rolls">
+			<button type="roll" name="roll_PhysicalDefenseStrength" value="
+				?{Favor
+					|None,/r (@{PhysicalDefenseRanks}+2)d10>@{StrengthTarget}
+					|1 Favor,/r (@{PhysicalDefenseRanks}+3)d10dl1>@{StrengthTarget}
+					|2 Favor,/r (@{PhysicalDefenseRanks}+4)d10dl2>@{StrengthTarget}
+					|1 Disfavor,/r (@{PhysicalDefenseRanks}+3)d10dh1>@{StrengthTarget}
+					|2 Disfavor,/r (@{PhysicalDefenseRanks}+4)d10dh2>@{StrengthTarget}
+				}
+			">Str</button>
+			<button type="roll" name="roll_PhysicalDefenseAgility" value="
+				?{Favor
+					|None,/r (@{PhysicalDefenseRanks}+2)d10>@{AgilityTarget}
+					|1 Favor,/r (@{PhysicalDefenseRanks}+3)d10dl1>@{AgilityTarget}
+					|2 Favor,/r (@{PhysicalDefenseRanks}+4)d10dl2>@{AgilityTarget}
+					|1 Disfavor,/r (@{PhysicalDefenseRanks}+3)d10dh1>@{AgilityTarget}
+					|2 Disfavor,/r (@{PhysicalDefenseRanks}+4)d10dh2>@{AgilityTarget}
+				}
+			">Agi</button>
+			<button type="roll" name="roll_PhysicalDefenseAcuity" value="
+				?{Favor
+					|None,/r (@{PhysicalDefenseRanks}+2)d10>@{AcuityTarget}
+					|1 Favor,/r (@{PhysicalDefenseRanks}+3)d10dl1>@{AcuityTarget}
+					|2 Favor,/r (@{PhysicalDefenseRanks}+4)d10dl2>@{AcuityTarget}
+					|1 Disfavor,/r (@{PhysicalDefenseRanks}+3)d10dh1>@{AcuityTarget}
+					|2 Disfavor,/r (@{PhysicalDefenseRanks}+4)d10dh2>@{AcuityTarget}
+				}
+			">Acu</button>
+		</div>
 	</div>
 	<div class="ability">
 		<label class="score">
 			<span>Mental Defense</span>
 			<input type="number" name="attr_MentalDefenseRanks" min="0" max="3" step="1" value="0" />
 		</label>
+		<div class="rolls">
+			<button type="roll" name="roll_MentalDefenseCognition" value="
+				?{Favor
+					|None,/r (@{MentalDefenseRanks}+2)d10>@{CognitionTarget}
+					|1 Favor,/r (@{MentalDefenseRanks}+3)d10dl1>@{CognitionTarget}
+					|2 Favor,/r (@{MentalDefenseRanks}+4)d10dl2>@{CognitionTarget}
+					|1 Disfavor,/r (@{MentalDefenseRanks}+3)d10dh1>@{CognitionTarget}
+					|2 Disfavor,/r (@{MentalDefenseRanks}+4)d10dh2>@{CognitionTarget}
+				}
+			">Cog</button>
+			<button type="roll" name="roll_MentalDefenseWillpower" value="
+				?{Favor
+					|None,/r (@{MentalDefenseRanks}+2)d10>@{WillpowerTarget}
+					|1 Favor,/r (@{MentalDefenseRanks}+3)d10dl1>@{WillpowerTarget}
+					|2 Favor,/r (@{MentalDefenseRanks}+4)d10dl2>@{WillpowerTarget}
+					|1 Disfavor,/r (@{MentalDefenseRanks}+3)d10dh1>@{WillpowerTarget}
+					|2 Disfavor,/r (@{MentalDefenseRanks}+4)d10dh2>@{WillpowerTarget}
+				}
+			">Wpw</button>
+			<button type="roll" name="roll_MentalDefenseSpirit" value="
+				?{Favor
+					|None,/r (@{MentalDefenseRanks}+2)d10>@{SpiritTarget}
+					|1 Favor,/r (@{MentalDefenseRanks}+3)d10dl1>@{SpiritTarget}
+					|2 Favor,/r (@{MentalDefenseRanks}+4)d10dl2>@{SpiritTarget}
+					|1 Disfavor,/r (@{MentalDefenseRanks}+3)d10dh1>@{SpiritTarget}
+					|2 Disfavor,/r (@{MentalDefenseRanks}+4)d10dh2>@{SpiritTarget}
+				}
+			">Spr</button>
+		</div>
 	</div>
 	<div class="buy">
 		<div class="cost">Cost: <span name="attr_AbilityPointCost"></span> ability points</div>
